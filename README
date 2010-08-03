@@ -1,0 +1,3 @@
+
+Demonstration of running ScalaTest with the ScalaTestAntTask. While I think sbt provides a better build
+system, scala adoption within legacy projects that have ant builds need to be accounted for too.
