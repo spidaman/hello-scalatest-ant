@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<project name="api" default="main" basedir=".">
+
+	<property environment="env"/>
+	<property name="lib.dir" value="lib"/>
+	<!-- set SCALA_HOME e.g. /opt/scala-2.8.0.final -->
+	<property name="scala.home" value="${env.SCALA_HOME}" />
+	<property name="scala.lib.dir" value="${scala.home}/lib" />
+	<property name="main.scala.src.dir" value="src/main/scala" /> 
+	<property name="test.scala.src.dir" value="src/test/scala" />
+	<property name="main.classes.dir" value="target/classes" />
+	<property name="test.classes.dir" value="target/test-classes" />
+	<path id="scala.classpath">
+		<fileset dir="${lib.dir}/">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${scala.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+    <path id="scalatest.classpath">
+      <pathelement location="${lib.dir}/scalatest-1.2.jar"/>
+      <pathelement location="${scala.lib.dir}/scala-library.jar"/>
+      <pathelement path="scala.classpath" />
+    </path>
+    
+	<taskdef name="scalac" classname="scala.tools.ant.Scalac">
+		<classpath refid="scala.classpath"/>
+	</taskdef>
+    <taskdef name="scalatest" classname="org.scalatest.tools.ScalaTestAntTask">
+        <classpath refid="scalatest.classpath" />
+    </taskdef>
+
+	<target name="compile">
+		<mkdir dir="${main.classes.dir}"/>
+		<scalac srcdir="${main.scala.src.dir}" destdir="${main.classes.dir}" scalacdebugging="false" deprecation="on">
+			<classpath refid="scala.classpath"/>
+		</scalac>
+		<mkdir dir="${test.classes.dir}"/>
+		<scalac srcdir="${test.scala.src.dir}" destdir="${test.classes.dir}" scalacdebugging="false" deprecation="on">
+			<classpath>
+				<path refid="scala.classpath"/>
+		        <path location="${main.classes.dir}"/>
+			</classpath>
+		</scalac>
+	</target>
+
+	<target name="test" depends="compile">
+        <scalatest haltonfailure="true" fork="false">
+            <runpath>
+                <pathelement path="scalatest.classpath" />
+		        <pathelement location="${main.classes.dir}"/> 
+		        <pathelement location="${test.classes.dir}"/>
+            </runpath>
+            <suite classname="ohai.scratch.test.BicycleSpec"/>
+            <reporter type="stdout" />
+         </scalatest>
+	</target>
+</project>
